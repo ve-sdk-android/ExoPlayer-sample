@@ -1,6 +1,7 @@
 package com.banuba.exoplayer.sample
 
 import android.content.Context
+import android.net.Uri
 import android.view.SurfaceView
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
@@ -14,16 +15,17 @@ import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 
-class VideoPlayerWrapper(private val context: Context) {
+data class VideoRecordRange(
+    val sourceUri: Uri,
+    val playFromMs: Long,
+    val playToMs: Long
+)
 
-    companion object {
-        private const val MIN_BUFFER_PLAYER_DURATION_MS = 5 * 1000
-        private const val MAX_BUFFER_PLAYER_DURATION_MS = 2 * MIN_BUFFER_PLAYER_DURATION_MS
-    }
+class SampleVideoPlayer(private val context: Context) {
 
     private var videoPlayer: ExoPlayer? = null
 
-    fun init(surface: SurfaceView) {
+    fun init(surface: SurfaceView, videoRanges: List<VideoRecordRange>) {
         videoPlayer?.release()
         val renderersFactory = DefaultRenderersFactory(context).apply {
             setEnableDecoderFallback(true)
@@ -31,10 +33,10 @@ class VideoPlayerWrapper(private val context: Context) {
         val trackSelector = DefaultTrackSelector(context, AdaptiveTrackSelection.Factory())
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
-                MIN_BUFFER_PLAYER_DURATION_MS,
-                MAX_BUFFER_PLAYER_DURATION_MS,
-                MIN_BUFFER_PLAYER_DURATION_MS,
-                MIN_BUFFER_PLAYER_DURATION_MS
+                5 * 1000,
+                10 * 1000,
+                5 * 1000,
+                5 * 1000
             )
             .setPrioritizeTimeOverSizeThresholds(true)
             .build()
@@ -46,11 +48,8 @@ class VideoPlayerWrapper(private val context: Context) {
                 repeatMode = Player.REPEAT_MODE_ALL
                 setVideoSurfaceView(surface)
                 seekTo(0)
+                setMediaSource(prepareMediaSource(videoRanges), true)
             }
-    }
-
-    fun putVideoRanges(videoRanges: List<VideoRecordRange>) {
-        videoPlayer?.setMediaSource(prepareMediaSource(videoRanges), true)
     }
 
     fun play() {
