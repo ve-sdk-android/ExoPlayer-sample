@@ -13,6 +13,9 @@ class MainActivity : AppCompatActivity() {
     private val player by lazy(LazyThreadSafetyMode.NONE) {
         SampleVideoPlayer(this)
     }
+    private val frameDrawer by lazy(LazyThreadSafetyMode.NONE) {
+        VideoFrameDrawer(findViewById(R.id.surfaceView))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +38,7 @@ class MainActivity : AppCompatActivity() {
                 playToMs = 5000L
             )
         )
-        player.init(findViewById(R.id.surfaceView), videoRanges)
+        player.init(frameDrawer.videoSurface, videoRanges)
     }
 
     override fun onStart() {
@@ -51,6 +54,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         player.release()
+        frameDrawer.release()
     }
 
     private fun copyFromAssetsToExternal(filename: String): File {

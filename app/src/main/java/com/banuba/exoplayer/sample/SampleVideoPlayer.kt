@@ -2,7 +2,7 @@ package com.banuba.exoplayer.sample
 
 import android.content.Context
 import android.net.Uri
-import android.view.SurfaceView
+import android.view.Surface
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
@@ -25,7 +25,7 @@ class SampleVideoPlayer(private val context: Context) {
 
     private var videoPlayer: ExoPlayer? = null
 
-    fun init(surface: SurfaceView, videoRanges: List<VideoRecordRange>) {
+    fun init(surface: Surface, videoRanges: List<VideoRecordRange>) {
         videoPlayer?.release()
         val renderersFactory = DefaultRenderersFactory(context).apply {
             setEnableDecoderFallback(true)
@@ -46,7 +46,7 @@ class SampleVideoPlayer(private val context: Context) {
             .build().apply {
                 prepare()
                 repeatMode = Player.REPEAT_MODE_ALL
-                setVideoSurfaceView(surface)
+                setVideoSurface(surface)
                 seekTo(0)
                 setMediaSource(prepareMediaSource(videoRanges), true)
             }
